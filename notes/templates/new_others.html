@@ -1,0 +1,28 @@
+{%extends 'user_admin_base.html'%}
+{% load staticfiles %}
+{%block body1%}
+	<div class="container">
+	{%for k ,v in form_dict.items%}
+	{{k}}部
+	<div class="row">
+			<div class="col-xs-8 col-xs-offset-2">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							创建新{{v.form_title}}
+						</h3>
+					</div>
+					<div class="panel-body">
+						<form action="{%url urls user.id%}" method="post">
+							{%csrf_token%}
+							{{v.as_p}}
+							<button name="submit">保存</button>
+						</form>
+						
+					</div>
+				</div>
+			</div>
+	</div>
+	{%endfor%}
+</div>
+{%endblock%}

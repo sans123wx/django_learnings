@@ -1,0 +1,26 @@
+{%extends 'user_admin_base.html'%}
+{% load staticfiles %}
+{%block body1%}
+<div class="container">
+	<div class="row">
+			<div class="col-xs-8 col-xs-offset-2">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<div class="panel-title">
+							<h4>
+							{{title}}
+							</h>
+							<a href="{% url urls user.id%}" class="pull-right">添加</a>
+						</div>
+					</div>
+					<ul class="list-group">
+       				{%for other in others%}
+        				<li class="list-group-item">
+        					{{other}}<a href="{%url urls_c other.id%}" class="pull-right">修改</a>
+        				</li>
+					{%endfor%}
+				</div>
+			</div>
+	</div>
+</div>
+{%endblock%}

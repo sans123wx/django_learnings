@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+</head>
+
+<body>
+	<details>
+		<summary>这是标题</summary>
+		这是内容
+	</details>
+	<button onClick="test()">xxx</button>
+	<table>
+		<tr id="一" hidden>
+		<td>第一个单元格</td><td>第二个单元格</td>
+		
+	</tr>
+	</table>
+	
+	<script type="text/javascript">
+		var test = function(){
+			var elem = document.getElementById('一');
+			if (elem.hasAttribute("hidden")){
+				elem.removeAttribute("hidden")
+			}else{
+				elem.setAttribute("hidden","hidden");
+			}
+		}
+	</script>
+</body>
+</html>

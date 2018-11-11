@@ -1,0 +1,84 @@
+{% extends 'base.html'%}
+{% load staticfiles %}
+{%block active_ybz%}
+class = "active"
+{%endblock%}
+{%block body1%}
+	<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">
+            报账汇总
+        </h3>
+    </div>
+    <div class="table-responsive">
+    <table class="table table-hover">
+        <th>序号</th><th>名称</th><th>报账日期</th><th>备注</th>
+        {% for rtl in report_time_lists %}
+	<tr><td>{{forloop.counter}}</td><td><a href="{%url 'ybz_detail' rtl.id%}">{{rtl.title}}</a></td><td>{{rtl.report_time|date:"Y.m.d"}}</td><td>{{rtl.detail}}</td>
+	{% endfor %}
+    </table>
+    </div>
+</div>
+<div id="container" style="max-width:800px;height:500px;margin: auto">	
+</div>
+<script>
+var chart = Highcharts.chart('container', {
+		char:{
+			margin:{marginLeft:2}	
+		},
+		title: {
+				text: '年度维修费用走势'
+		},
+		credits:{enabled:false},
+		yAxis: {
+				title: {
+						text: '金额'
+				}
+		},
+		legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle'
+		},
+		plotOptions: {
+				series: {
+						label: {
+								connectorAllowed: false
+						},
+						pointStart: 2018
+				}
+		},
+		series: [{ 
+				 name: '维修总金额',
+				 data: [21561,19234,20982,23412,23456]
+		},
+				{
+				name: '蓝鸽',
+				data: [8391,5866,6230,5323,6321]
+		},
+				 {
+				name: '志向',
+				data: [13170,15902,13710,12321,12443]
+		}
+		],
+		responsive: {
+				rules: [{
+						condition: {
+								maxWidth: 500
+						},
+						chartOptions: {
+								legend: {
+										layout: 'horizontal',
+										align: 'center',
+										verticalAlign: 'bottom'
+								}
+						}
+				}]
+		}
+});
+</script>
+{%endblock%}
+{%block scripts%}
+<script src="{% static 'js/highcharts.js' %}"></script>
+<script src="{% static 'js/exporting.js' %}"></script>
+<script src="{% static 'js/highcharts-zh_CN.js' %}"></script>
+{%endblock%}

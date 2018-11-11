@@ -1,0 +1,30 @@
+﻿{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="widtd=device-widtd, initial-scale=1">
+    <title>维修记录</title>
+    <link href="{% static 'css/bootstrap.min.css'%}" rel="stylesheet">
+	<style>
+		td{
+			border:1px solid #000!important
+}
+	tr{
+			border:1px solid #000
+}
+	</style>
+  </head>
+  <body>
+    <table class = 'table'>
+	<tr><td colspan = 9 align = 'center'>维修汇总</td></tr>
+	 <tr   align = 'center'><td>序号</td><td>日期</td><td>类别</td><td>型号</td><td>单价（元）</td><td>数量（台）</td><td>备注（教室编号）</td><td>合计（元）</td><td>是否报账</td></tr>
+        {% for content in contents %}
+	<tr  align = 'center'><td>{{forloop.counter}}</td><td>{{content.date|date:"Y.m.d"}}</td><td>{{content.类别}}</td><td>{{content.型号}}</td><td>{{content.价格}}</td><td>{{content.数量}}</td><td>{{content.教室}}</td><td>{{content.合计}}</td><td>是</td></tr>
+	{% endfor %}
+    </table>
+    <script src="{% static 'jquery1.12.4.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+{%extends 'base.html'%}
+{% load staticfiles %}
+{%block body1%}
+<div class="panel panel-default">
+    <div class="panel-heading">
+	<h3 class="panel-title">
+            {{title}}
+        </h3></div>
+    <div class="panel-body">
+        总价：{{prices}}<br>
+	{% for count in counts%}
+		{{count}}：{{count.total}}&nbsp&nbsp
+	{%endfor%}
+    </div>
+    <div class="table-responsive">
+    <table class="table table-hover">
+        <th>序号</th><th>日期</th><th>类别</th><th>型号</th><th>故障描述</th><th>单价（元）</th><th>数量（台）</th><th>备注（教室编号）</th><th>处理方式</th><th>售后单位</th><th>合计（元）</th><th>报账时间</th><th>操作</th>
+        {% for content in contents %}
+	<tr><td>{{forloop.counter}}</td><td>{{content.date|date:"Y-m-d"}}</td><td>{{content.类别}}</td><td>{{content.型号}}</td><td>{{content.故障描述}}</td><td>{{content.价格}}</td><td>{{content.数量}}</td><td>{{content.教室}}</td><td>{{content.方式}}</td><td>{{content.售后}}</td><td>{{content.合计}}</td><td>{{content.报账时间}}</td><td><button onClick="h{{content.id}}()">详情</button></td></tr>
+	<tr class={{content.id}} hidden><th>状态</th><th>通知时间</th><th>到校时间</th><th>返校时间</th><th>响应时间</th><th>修复时间</th></tr>
+	<tr class={{content.id}} hidden><td>{{content.状态}}</td><td>{{content.通知时间}}</td><td>{{content.到校时间}}</td><td>{{content.返校时间}}</td><td>{{content.响应时间}}</td><td>{{content.修复时间}}</td></tr>
+	{% endfor %}
+    </table>
+   </div>
+</div>
+<div id="container" style="min-width:0px;min-height:0px">	
+</div>
+<script>
+	var charts=Highcharts.chart('container',{
+		char:{type:'line'},
+		title:{text:'{{title}}'},
+		credits:{enabled:false},
+		tooltip: {
+				headerFormat: '{series.name}<br>',
+				pointFormat: '{point.name}: <b>{point.percentage:.1f}%</b>'
+		},
+		plotOptions: {
+				pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						dataLabels: {
+								enabled: true,
+								format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+								style: {
+										color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+								}
+						},
+						states: {
+								hover: {
+										enabled: false
+								}  
+						},
+					slicedOffset: 20,         // 突出间距
+						point: {                  // 每个扇区是数据点对象，所以事件应该写在 point 下面
+								events: {
+										// 鼠标滑过是，突出当前扇区
+										mouseOver: function() {
+												this.slice();
+										},
+										// 鼠标移出时，收回突出显示
+										mouseOut: function() {
+												this.slice();
+										},
+										// 默认是点击突出，这里屏蔽掉
+										click: function() {
+												return false;
+										}
+								}
+						}
+				}
+		},
+		series: [{
+				type: 'pie',
+				name: '维修费用比例',
+				data: [
+						{% for count in counts %}
+							['{{count}}总价{{count.total_p}} ',{{count.total_p}}],
+						{%endfor%}]
+						
+				}],
+	})
+	{%for content in contents%}
+		var h{{content.id}} = function(){
+			var elem = document.getElementsByClassName({{content.id}});
+			for (var i=0;i < elem.length ;i++){
+			if (elem[i].hasAttribute("hidden")){
+				elem[i].removeAttribute("hidden")
+			}else{
+				elem[i].setAttribute("hidden","hidden");
+			}
+		}}
+	{%endfor%}
+</script>
+{%endblock%}
+
+{%block scripts%}
+<script src="{% static 'js/highcharts.js' %}"></script>
+<script src="{% static 'js/exporting.js' %}"></script>
+<script src="{% static 'js/highcharts-zh_CN.js' %}"></script>
+{%endblock%}
