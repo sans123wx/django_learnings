@@ -12,16 +12,13 @@
     </div>
     <ul class="list-group">
         <li class="list-group-item">
-        	<a href="{% url 'management_customers' user.id%}">售后单位</a><a href="{% url 'new_customer' user.id%}" class="pull-right">添加</a>
+        	<a href="{% url 'management_customers' user.id%}?group={{group_id}}">售后单位</a><a href="{% url 'new_customer' user.id%}?group={{group_id}}" class="pull-right">添加</a>
 		</li>
         <li class="list-group-item">
-        	<a href="{% url 'management_unit_types' user.id%}">设备类型</a><a href="{% url 'new_unit_type' user.id%}" class="pull-right">添加</a>
+        	<a href="{% url 'management_unit_types' user.id%}?group={{group_id}}">设备类型</a><a href="{% url 'new_unit_type' user.id%}?group={{group_id}}" class="pull-right">添加</a>
         </li>
          <li class="list-group-item">
-        	<a href="{% url 'management_unit_models' user.id%}">设备型号</a><a href="{% url 'new_unit_model' user.id%}" class="pull-right">添加</a>
-        </li>
-         <li class="list-group-item">
-        	<a href="#">处理方式</a><a href="#" class="pull-right">添加</a>
+        	<a href="{% url 'management_unit_models' user.id%}?group={{group_id}}">设备型号</a><a href="{% url 'new_unit_model' user.id%}?group={{group_id}}" class="pull-right">添加</a>
         </li>
     </ul>
 	</div>

@@ -4,6 +4,7 @@ from django.db.models import Sum,Count
 from .forms import *
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from django.forms import modelformset_factory
 from .default_settings import *
 
@@ -31,11 +32,16 @@ def ybz_detail(request,rtl_id):
     context['prices'] = prices
     return render(request,'ybz_detail.html',context)
 
-def print_page(request,cust):
-    contents_all = Notes.objects.filter(售后=cust,报账=True)
+def print_page(request,user_id):
+    if request.user.id != user_id:
+        raise Http404('兄弟，别乱搞')
+    notes_id = request.POST.getlist('note')
+    notes = [Notes.objects.get(id = x) for x in notes_id]
+    total_price = sum([x.合计 for x in notes])
     context = {}
-    context['contents'] = contents_all
-    return render(request,'print.html',context)
+    context['notes'] = notes
+    context['total_price'] = total_price
+    return render(request,'print_page.html',context)
 
 def report_time_list(request):
     report_time_lists = Report_time.objects.all()
@@ -49,6 +55,11 @@ def new_note(request,user_id):
     if request.user.id != user_id:
         raise Http404('兄弟，别乱搞')
     owner = get_object_or_404(User,id = user_id)
+    groups = owner.groups.all()
+    group_id = request.GET.get('group')
+    group = get_object_or_404(Group , id = group_id)
+    if group not in groups:
+        raise Http404('没有权限')
     if request.method == 'POST':
         form = NoteForm(request.POST)
         if form.is_valid():
@@ -57,39 +68,29 @@ def new_note(request,user_id):
             form_new.报账 = False
             form_new.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
-    else:
-        groups = owner.groups.all()
-        form_dict = {'dj':{
-                            '蓝鸽':[
-                                    NoteForm_dj(initial={'类别':1 , '型号':1 , '故障描述':2 ,'价格':525 , '数量':1 , '方式':'跟换电源板' , '售后':1}),
-                                    NoteForm_dj(initial={'类别':2 , '型号':2 , '故障描述':6 ,'价格':290 , '数量':1 , '方式':'返厂维修' , '售后':1}), 
-                                   ],
-                            '志向':[
-                                    NoteForm_dj(initial={'类别':5 , '型号':5 , '故障描述':5 ,'价格':180 , '数量':1 , '方式':'光路除尘' , '售后':2}),
-                                   ],
-                            '空表':[
-                                    NoteForm_dj()
-                                    ]
-                       
-                           },
-                      'wl':{
-                            '大金':[
-                                    NoteForm_wl()
-                                    ],
-                            '空表':[
-                                   NoteForm_wl()
-                                   ]
-                           }                                 
-                    }
-        form_list = [form_dict[i.name] for i in groups]
+    else:       
+        form = NoteForm()
+        form.fields['售后'].queryset = Customer.objects.filter(group = group)
+        form.fields['类别'].queryset = Unit_types.objects.filter(customer__group = group)
+        form.fields['型号'].queryset = Unit_models.objects.filter(设备类型__customer__group = group)
         context = {}
-        context['list'] = zip(groups,form_list)
+        context['form'] = form
+        context['group'] = group
         return render(request,'new_note.html',context)
 
 def management(request , user_id):
     if request.user.id != user_id:
         raise Http404('兄弟，别乱搞')
-    return render(request , 'management.html')
+    owner = get_object_or_404(User,id = user_id)
+    groups = owner.groups.all()
+    group_id = request.GET.get('group')
+    group_bz = get_object_or_404(Group , id = 5)
+    group = get_object_or_404(Group , id = group_id)
+    if group_bz not in groups or group not in groups:
+        raise Http404('没有权限')
+    context = {}
+    context['group_id'] = request.GET.get('group')
+    return render(request , 'management.html' , context)
 
 def management_customers(request , user_id):
     customers = Customer.objects.filter(group__user__id = user_id)
@@ -98,6 +99,7 @@ def management_customers(request , user_id):
     context['title'] = '管理售后单位'
     context['urls'] = 'new_customer'
     context['urls_c'] = 'edit_customer'
+    context['group_id'] = request.GET.get('group')
     return render(request , 'management_others.html' , context)
 
 def management_unit_types(request , user_id):
@@ -107,6 +109,7 @@ def management_unit_types(request , user_id):
     context['title'] = '管理设备类型'
     context['urls'] = 'new_unit_type'
     context['urls_c'] = 'edit_unit_type'
+    context['group_id'] = request.GET.get('group')
     return render(request , 'management_others.html' , context)
 
 def management_unit_models(request , user_id):
@@ -116,6 +119,7 @@ def management_unit_models(request , user_id):
     context['title'] = '管理设备型号'
     context['urls'] = 'new_unit_model'
     context['urls_c'] = 'edit_unit_model'
+    context['group_id'] = request.GET.get('group')
     return render(request , 'management_others.html' , context)
 
 def new_customer(request , user_id):
@@ -127,20 +131,22 @@ def new_customer(request , user_id):
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
     else:
-        groups = Group.objects.filter(user = user_id)
-        form_dict = {x.name:CUSTOMER_FORM_DICT[x.name] for x in groups}
+        group_id = request.GET.get('group')
+        form = CustomerForm()
+        form.fields['group'].queryset = Group.objects.filter(id = group_id)
         context = {}
-        context['form_dict'] = form_dict
+        context['form'] = form
         context['urls'] = 'new_customer'
         return render(request , 'new_others.html' , context)
 
 def edit_customer(request , customer_id):
     customer = Customer.objects.get(id = customer_id)
-    group = customer.group.name
+    group = customer.group
     if request.method != 'POST':
-        form = CUSTOMER_FORM_CLASS_DICT[group](instance = customer)
+        form = CustomerForm(instance = customer)
+        form.fields['group'].queryset = Group.objects.filter(id = group.id)
     else:
-        form = CUSTOMER_FORM_CLASS_DICT[group](instance = customer , data = request.POST)
+        form = CustomerForm(instance = customer , data = request.POST)
         if form.is_valid():
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
@@ -159,20 +165,20 @@ def new_unit_type(request , user_id):
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
     else:
-        groups = Group.objects.filter(user = user_id)
-        form_dict = {x.name:UNIT_TYPE_FORM_DICT[x.name] for x in groups}
+        form = Unit_typeForm()
+        form.fields['customer'].queryset = Customer.objects.filter(group__id = request.GET.get('group'))
         context = {}
-        context['form_dict'] = form_dict
+        context['form'] = form
         context['urls'] = 'new_unit_type'
         return render(request , 'new_others.html' , context)
 
 def edit_unit_type(request , unit_type_id):
     unit_type = Unit_types.objects.get(id = unit_type_id)
-    group = unit_type.customer.group.name
     if request.method != 'POST':
-        form = UNIT_TYPE_FORM_CLASS_DICT[group](instance = unit_type)
+        form = Unit_typeForm(instance = unit_type)
+        form.fields['customer'].queryset = Customer.objects.filter(group__id = request.GET.get('group'))
     else:
-        form = UNIT_TYPE_FORM_CLASS_DICT[group](instance = unit_type , data = request.POST)
+        form = Unit_typeForm(instance = unit_type , data = request.POST)
         if form.is_valid():
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
@@ -191,20 +197,20 @@ def new_unit_model(request , user_id):
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
     else:
-        groups = Group.objects.filter(user = user_id)
-        form_dict = {x.name:UNIT_MODEL_FORM_DICT[x.name] for x in groups}
+        form = Unit_modelForm()
+        form.fields['设备类型'].queryset = Unit_types.objects.filter(customer__group__id = request.GET.get('group'))
         context = {}
-        context['form_dict'] = form_dict
+        context['form'] = form
         context['urls'] = 'new_unit_model'
         return render(request , 'new_others.html' , context)
 
 def edit_unit_model(request , unit_model_id):
     unit_model = Unit_models.objects.get(id = unit_model_id)
-    group = unit_model.设备类型.customer.group.name
     if request.method != 'POST':
-        form = UNIT_MODEL_FORM_CLASS_DICT[group](instance = unit_model)
+        form = Unit_modelForm(instance = unit_model)
+        form.fields['设备类型'].queryset = Unit_types.objects.filter(customer__group__id = request.GET.get('group'))
     else:
-        form = UNIT_MODEL_FORM_CLASS_DICT[group](instance = unit_model , data = request.POST)
+        form = Unit_modelForm(instance = unit_model , data = request.POST)
         if form.is_valid():
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
@@ -216,11 +222,14 @@ def edit_unit_model(request , unit_model_id):
 
 def edit_note(request , note_id):
     note = Notes.objects.get(id = note_id)
-    group = note.售后.group.name
+    group = note.售后.group
     if request.method != 'POST':
-        form = NOTE_FORM_CLASS_DICT[group](instance = note)
+        form = NoteForm(instance = note)
+        form.fields['售后'].queryset = Customer.objects.filter(group = group)
+        form.fields['类别'].queryset = Unit_types.objects.filter(customer__group = group)
+        form.fields['型号'].queryset = Unit_models.objects.filter(设备类型__customer__group = group)
     else:
-        form = NOTE_FORM_CLASS_DICT[group](instance = note , data = request.POST)
+        form = NoteForm(instance = note , data = request.POST)
         if form.is_valid():
             form.save()
             return redirect(reverse('user_admin' , args=[request.user.id]))
@@ -263,3 +272,79 @@ def user_admin_ybz(request,user_id):
     context['counts'] = counts
     context['customers'] = customers
     return render(request,'user_admin_ybz.html',context)
+
+def report_customer(request , user_id):
+    if request.user.id != user_id:
+        raise Http404('兄弟，别乱搞')
+    owner = get_object_or_404(User,id = user_id)
+    groups = owner.groups.all()
+    group_id = request.GET.get('group')
+    group_bz = get_object_or_404(Group , id = 5)
+    group = get_object_or_404(Group , id = group_id)
+    if group_bz not in groups or group not in groups:
+        raise Http404('没有权限')
+    customers = Customer.objects.filter(group = group)
+    context = {}
+    context['customers'] = customers
+    context['group'] = group
+    return render(request , 'report_customer.html' , context)    
+    
+def report(request , user_id):
+    if request.user.id != user_id:
+        raise Http404('兄弟，别乱搞')
+    owner = get_object_or_404(User,id = user_id)
+    groups = owner.groups.all()
+    group_id = request.GET.get('group')
+    group_bz = get_object_or_404(Group , id = 5)
+    group = get_object_or_404(Group , id = group_id)
+    if group_bz not in groups or group not in groups:
+        raise Http404('没有权限')
+    notes = Notes.objects.filter(报账 = False , 售后__id = request.GET.get('customer'))
+    report_times = Report_time.objects.filter(customer__group = group)
+    context = {}
+    context['notes'] = notes
+    context['report_times'] = report_times
+    context['group'] = group
+    return render(request , 'report.html' , context)
+
+def report_bz(request , user_id):
+    if request.user.id != user_id:
+        raise Http404('兄弟，别乱搞')
+    if request.method == 'POST':
+        notes_id = request.POST.getlist('note')
+        report_time_id = request.POST.get('report_time')
+        report_time = get_object_or_404(Report_time , id = report_time_id)
+        for note_id in notes_id:
+            note = get_object_or_404(Notes , id = note_id)
+            note.报账时间 = report_time
+            note.报账 =  True
+            note.save()
+        return redirect(reverse('ybz'))
+
+def new_report_time(request , user_id):
+    if request.user.id != user_id:
+        raise Http404('兄弟，别乱搞')
+    owner = get_object_or_404(User,id = user_id)
+    groups = owner.groups.all()
+    group_id = request.GET.get('group')
+    group_bz = get_object_or_404(Group , id = 5)
+    group = get_object_or_404(Group , id = group_id)
+    if group_bz not in groups or group not in groups:
+        raise Http404('没有权限')
+    if request.method == 'POST':
+        form = Report_timeForm(request.POST)
+        if form.is_valid():
+            customer_id = form.cleaned_data['customer'].id
+            form.save()
+            return redirect(reverse('report' , args=[user_id]) + '?group=' + group_id + '&customer=' + str(customer_id))
+    else:
+        form = Report_timeForm()
+        form.fields['customer'].queryset = Customer.objects.filter(group = group)
+        context = {}
+        context['form'] = form
+        context['group'] = group
+        return render(request , 'new_report_time.html' , context)
+
+def logout_view(request):
+    logout(request)
+    return redirect(reverse('home'))

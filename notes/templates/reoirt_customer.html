@@ -1,0 +1,26 @@
+{%extends 'user_admin_base.html'%}
+{% load staticfiles %}
+{%block body1%}
+	
+		<div class="container">
+<div class="row">
+			<div class="col-xs-8 col-xs-offset-2">
+	<div class="panel panel-default">
+    <div class="panel-heading">
+    	<h4>
+    		售单位
+    	</h4>
+    </div>
+    <ul class="list-group">
+       {%for customer in customers%}
+        <li class="list-group-item">
+        	<a href="{%url 'report' user.id%}?group={{group.id}}&customer={{customer.id}}">{{customer}}</a>
+		</li>
+       {%endfor%}
+    </ul>
+	</div>
+	</div>
+</div>
+</div>
+	
+{%endblock%}

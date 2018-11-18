@@ -15,7 +15,7 @@ class Unit_modelsAdmin(admin.ModelAdmin):
 
 @admin.register(Report_time)
 class Report_timeAdmin(admin.ModelAdmin):
-    list_display = ('id','title','report_time','detail')
+    list_display = ('id','title','report_time','detail','customer')
 
 @admin.register(Unit_types)
 class Unit_typesAdmin(admin.ModelAdmin):

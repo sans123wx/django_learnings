@@ -6,54 +6,18 @@
 <script src="{% static 'js/highcharts-zh_CN.js' %}"></script>
 {%endblock%}
 {%block body1%}
-{%for group , forms in list%}
 	<div class="panel panel-default" style="margin-bottom:0">  
     <div class="panel-heading">
         <h3 class="panel-title">
             新建{{group.name}}维修记录
         </h3>
     </div>
-    {%for key , value in forms.items%}
-        {%if key == '空表'%}
-				{%for f in value%}
 		<div class="panel-body">
-			<form action="{%url 'new_note' user.id%}" method="post">
+			<form action="{%url 'new_note' user.id%}?group={{group.id}}" method="post">
 				{%csrf_token%}
-				{{f}}
+				{{form.as_p}}
 				<button name="submit">保存</button> 
 			</form>
-			
 		</div>
-				{%endfor%}
-			{%endif%}
-   	{%endfor%}
 </div>
-	{%for customer in group.customer_set.all%}
-<div class="panel panel-default" style="margin-bottom:0">  
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            {{customer}}
-        </h3>
-    </div>
-    {%if customer.title not in forms.keys%}
-    	<div class="panel-body">没有添加默认值 </div>
-    {%else%}
-    {%for key , value in forms.items%}
-        {%if key == customer.title%}
-				{%for f in value%}
-						<div class="panel-body"> 
-							<form action="{%url 'new_note' user.id%}" method="post">
-								{%csrf_token%}
-								{{f}}
-								<button name="submit">保存</button> 
-							</form>
-						</div>
-				{%endfor%}
-			{%endif%}
-   	{%endfor%}
-   	{%endif%}
-</div>
-	{%endfor%}
-{%endfor%}
-
 {%endblock%}

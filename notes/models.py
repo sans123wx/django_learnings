@@ -40,16 +40,12 @@ class Unit_models(models.Model):
 
 class Report_time(models.Model):
     title = models.CharField(max_length = 30,verbose_name = '名称')
-    detail = models.CharField(max_length = 30 , verbose_name = '备注')
+    detail = models.CharField(max_length = 30 , default = '无' , verbose_name = '备注')
     report_time = models.DateField(verbose_name = '报账时间')
-    test_time = models.CharField(max_length = 30,blank = True,null = True)
-
-    def save(self):
-        self.test_time = str(self.report_time)
-        super().save()
+    customer = models.ForeignKey(Customer , on_delete = models.DO_NOTHING , verbose_name = '售后')
 
     def __str__(self):
-        return self.test_time
+        return self.title
 
     class Meta:
         verbose_name = '报账时间'

@@ -1,20 +1,10 @@
 from django import forms
 from .models import *
-
+    
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Notes
-        fields = ['date','类别','型号','故障描述','价格','数量','教室','方式','售后','通知时间','到校时间','返校时间']
-
-class NoteForm_dj(NoteForm):
-    类别 = forms.ModelChoiceField(queryset=Unit_types.objects.filter(customer__group__id = 1))
-    型号 = forms.ModelChoiceField(queryset=Unit_models.objects.filter(设备类型__customer__group__id  = 1))
-    售后 = forms.ModelChoiceField(queryset=Customer.objects.filter(group__id = 1))
-
-class NoteForm_wl(NoteForm):
-    类别 = forms.ModelChoiceField(queryset=Unit_types.objects.filter(customer__group__id = 2))
-    型号 = forms.ModelChoiceField(queryset=Unit_models.objects.filter(设备类型__customer__group__id  = 2))
-    售后 = forms.ModelChoiceField(queryset=Customer.objects.filter(group__id = 2))
+        fields = ['date','售后','类别','型号','故障描述','价格','数量','教室','方式','通知时间','到校时间','返校时间']
 
 class CustomerForm(forms.ModelForm):
     form_title = '售后单位'
@@ -52,3 +42,7 @@ class Unit_modelForm_dj(Unit_modelForm):
 class Unit_modelForm_wl(Unit_modelForm):
     设备类型 = forms.ModelChoiceField(queryset = Unit_types.objects.filter(customer__group__id = 2))
         
+class Report_timeForm(forms.ModelForm):
+    class Meta:
+        model = Report_time
+        fields = '__all__'

@@ -6,8 +6,9 @@ urlpatterns = [
     path('' , wbz , name = 'home'),
     path('ybz/' , report_time_list , name = 'ybz'),
     path('ybz_detail/<int:rtl_id>' , ybz_detail , name = 'ybz_detail'),
-    path('print_page/<int:cust>/', print_page , name = 'print_page'),
+    path('print_page/<int:user_id>/', print_page , name = 'print_page'),
     path('login',LoginView.as_view(template_name='login.html'),name='login'),
+    path('logout_view' , logout_view , name = 'logout_view'),
     path('user_admin/<int:user_id>',user_admin , name = 'user_admin'),
     path('user_admin/ybz/<int:user_id>' , user_admin_ybz , name = 'user_admin_ybz'),
     path('management/<int:user_id>' , management , name = 'management'),
@@ -23,6 +24,9 @@ urlpatterns = [
     path('edit_unit_model/<int:unit_model_id>' , edit_unit_model , name = 'edit_unit_model'),
     path('edit_note/<int:note_id>' , edit_note , name = 'edit_note'),
     path('delete_note/<int:note_id> ', delete_note  , name = 'delete_note'),
-    
+    path('report/<int:user_id>' , report , name = 'report'),
+    path('report_bz/<int:user_id>' , report_bz , name = 'report_bz'),
+    path('new_report_time/<int:user_id>' , new_report_time , name = 'new_report_time'),
+    path('report_customer/<int:user_id>' , report_customer , name = 'report_customer'),
     
 ]

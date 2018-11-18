@@ -1,0 +1,9 @@
+{%extends 'user_admin_base.html'%}
+{% load staticfiles %}
+{%block body1%}
+	<form action="{%url 'new_report_time' user.id%}?group={{group.id}}" method="post">
+		{%csrf_token%}
+		{{form.as_p}}
+		<button>保存</button>
+	</form>
+{%endblock%}

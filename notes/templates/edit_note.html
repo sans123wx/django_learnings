@@ -1,7 +1,10 @@
 {%extends 'user_admin_base.html'%}
 {% load staticfiles %}
 {%block body1%}
-<div class="panel panel-default">
+<div class="container">
+	<div class="row">
+			<div class="col-xs-8 col-xs-offset-2">
+				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
 							编辑维修记录
@@ -10,11 +13,16 @@
 					<div class="panel-body">
 						<form action="{%url urls_c note.id%}" method="post">
 							{%csrf_token%}
-							{{form}}
+							{{form.as_p}}
 							<button name="submit">保存</button>
 						</form>
 						
 					</div>
 				</div>
+
+			</div>
+	</div>
+</div>
+
 
 {%endblock%}

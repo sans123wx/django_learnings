@@ -32,9 +32,3 @@ UNIT_MODEL_FORM_CLASS_DICT = {
 
 
 OTHERS_LIST = (CUSTOMER_FORM_DICT , UNIT_TYPE_FORM_DICT , UNIT_MODEL_FORM_DICT)
-
-NOTE_FORM_CLASS_DICT = {
-                'dj':NoteForm_dj,
-                'wl':NoteForm_wl,
-                
-    }
