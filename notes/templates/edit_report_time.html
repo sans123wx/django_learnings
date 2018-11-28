@@ -7,11 +7,11 @@
 			<div class="panel panel-default">  
 				<div class="panel-heading">
 					<h3 class="panel-title">
-						新建报账时间
+						修改报账时间
 					</h3>
 				</div>   
 				<div class="panel-body">
-					<form action="{%url 'new_report_time' user.id%}?group={{group.id}}" method="post">
+					<form action="{%url 'edit_report_time' report_time_id%}" method="post">
 						{%csrf_token%}
 						{%for field in form%}
 							<label for={{field.id_for_label}}>{{field.label}}</label>

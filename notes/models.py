@@ -43,6 +43,7 @@ class Report_time(models.Model):
     detail = models.CharField(max_length = 30 , default = '无' , verbose_name = '备注')
     report_time = models.DateField(verbose_name = '报账时间')
     customer = models.ForeignKey(Customer , on_delete = models.DO_NOTHING , verbose_name = '售后')
+    used = models.BooleanField(default = False , verbose_name = '是否已使用')
 
     def __str__(self):
         return self.title
@@ -72,6 +73,11 @@ class Notes(models.Model):
     报账时间 = models.ForeignKey(Report_time,on_delete = models.DO_NOTHING,blank = True , null = True)
     合计 = models.IntegerField(blank = True , null = True)
     owner = models.ForeignKey(User,on_delete = models.DO_NOTHING)
+    sn = models.CharField(max_length = 30,blank = True , null = True , default = '无' , verbose_name = '序列号')
+    asp = models.CharField(max_length = 30,blank = True , null = True , verbose_name = '售后人员')
+    telephone = models.CharField(max_length = 30,blank = True , null = True , verbose_name = '售后电话')
+    scraped = models.BooleanField(default = False , verbose_name = '是否报废')
+    
 
     def __str__(self):
         return self.类别.设备类型
@@ -89,9 +95,11 @@ class Notes(models.Model):
         if self.返校时间:
             if not self.到校时间:
                 raise Http404
-            else:
+            elif not self.scraped:
                 self.状态 = '设备已修复'
                 self.修复时间 = self.返校时间 - self.到校时间
+            else:
+                self.状态 = '设备报废'
         super().save()
         
 

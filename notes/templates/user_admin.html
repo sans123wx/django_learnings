@@ -19,15 +19,14 @@ class = "active"
     <table class="table table-hover">
         <th>序号</th><th>日期</th><th>类别</th><th>型号</th><th>故障描述</th><th>单价（元）</th><th>数量（台）</th><th>备注（教室编号）</th><th>处理方式</th><th>售后单位</th><th>合计（元）</th><th>是否报账</th><th>记录人</th><th>操作</th>
         {% for content in notes %}
-	<tr><td>{{forloop.counter}}</td><td>{{content.date|date:"Y-m-d"}}</td><td>{{content.类别}}</td><td>{{content.型号}}</td><td>{{content.故障描述}}</td><td>{{content.价格}}</td><td>{{content.数量}}</td><td>{{content.教室}}</td><td>{{content.方式}}</td><td>{{content.售后}}</td><td>{{content.合计}}</td><td>否</td><td>{{content.owner}}</td><td><button onClick="h{{content.id}}()">详情</button>-<a href="{% url 'edit_note'  content.id%}" >修改</a>-<a href="{% url 'delete_note' content.id%}" onClick="return delete_waring()">删除</a></td></tr>
+	<tr><td>{{forloop.counter}}</td><td>{{content.date|date:"Y-m-d"}}</td><td>{{content.类别}}</td><td>{{content.型号}}</td><td>{{content.故障描述}}</td><td>{{content.价格}}</td><td>{{content.数量}}</td><td>{{content.教室}}</td><td>{{content.方式}}</td><td>{{content.售后}}</td><td>{{content.合计}}</td><td>否</td><td>{{content.owner}}</td><td><button class='btn btn-link'  onClick="show_detail({{content.id}})">详情</button>-<a href="{% url 'edit_note'  content.id%}" >修改</a>-<a href="{% url 'delete_note' content.id%}" onClick="return delete_waring()">删除</a></td></tr>
 	<tr class={{content.id}} hidden><th>状态</th><th>通知时间</th><th>到校时间</th><th>返校时间</th><th>响应时间</th><th>修复时间</th></tr>
 	<tr class={{content.id}} hidden><td>{{content.状态}}</td><td>{{content.通知时间}}</td><td>{{content.到校时间}}</td><td>{{content.返校时间}}</td><td>{{content.响应时间}}</td><td>{{content.修复时间}}</td></tr>
 	{% endfor %}
     </table>
     </div>
 </div>
-<div id="container" style="min-width:400px;height:400px">	
-</div>
+<div id="container" style="min-width:400px;height:400px"></div>
 <script>
 	var charts=Highcharts.chart('container',{
 		char:{type:'line'},
@@ -83,20 +82,18 @@ class = "active"
 				}],
 	})
 	function delete_waring(){
-		var info = confirm(11);
+		var info = confirm("确认删除吗？");
 		return info;
 	}
-	{%for content in notes%}
-		var h{{content.id}} = function(){
-			var elem = document.getElementsByClassName({{content.id}});
-			for (var i=0;i < elem.length ;i++){
+	var show_detail=function(content_id){
+		var elem = document.getElementsByClassName(content_id);
+		for (var i=0;i < elem.length ;i++){
 			if (elem[i].hasAttribute("hidden")){
 				elem[i].removeAttribute("hidden")
 			}else{
 				elem[i].setAttribute("hidden","hidden");
 			}
 		}}
-	{%endfor%}
 	
 </script>
 {%endblock%}

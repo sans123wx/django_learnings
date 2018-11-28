@@ -1,0 +1,79 @@
+{% extends 'base.html'%}
+{% load staticfiles %}
+{%block body1%}
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">
+            报账汇总
+        </h3>
+    </div>
+    <div class="table-responsive">
+    <table class="table table-hover">
+        <th>序号</th><th>名称</th><th>报账日期</th><th>备注</th><th>部门</th>
+        {% for rtl in reports %}
+	<tr><td>{{forloop.counter}}</td><td><a href="{%url 'ybz_detail' rtl.id%}">{{rtl.title}}</a></td><td>{{rtl.report_time|date:"Y.m.d"}}</td><td>{{rtl.detail}}</td><td>{{rtl.customer.group.name}}</td></tr>
+	{% endfor %}
+    </table>
+ </div>
+    </div>
+    <div id="container" style="max-width:800px;height:500px;margin: auto">	
+</div>
+<script>
+var chart = Highcharts.chart('container', {
+		char:{
+			margin:{marginLeft:2}	
+		},
+		title: {
+				text: '年度维修费用走势'
+		},
+		credits:{enabled:false},
+		yAxis: {
+				title: {
+						text: '金额'
+				}
+		},
+		legend: {
+				layout: 'vertical',
+				align: 'right',
+				verticalAlign: 'middle'
+		},
+		plotOptions: {
+				series: {
+						label: {
+								connectorAllowed: false
+						},
+						pointStart: 2018
+				}
+		},
+		series: [
+				{%for customer in customer_years%}
+					{%for k , v in customer.items%}
+						{
+							name:'{{k}}',
+							data:{{v}}
+						},
+					{%endfor%}
+				{%endfor%}
+		],
+		responsive: {
+				rules: [{
+						condition: {
+								maxWidth: 500
+						},
+						chartOptions: {
+								legend: {
+										layout: 'horizontal',
+										align: 'center',
+										verticalAlign: 'bottom'
+								}
+						}
+				}]
+		}
+});
+</script>
+
+{%endblock%}
+{%block scripts%}
+<script src="{% static 'js/highcharts.js' %}"></script>
+<script src="{% static 'js/exporting.js' %}"></script>
+<script src="{% static 'js/highcharts-zh_CN.js' %}"></script>
+{%endblock%}

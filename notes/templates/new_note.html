@@ -6,18 +6,52 @@
 <script src="{% static 'js/highcharts-zh_CN.js' %}"></script>
 {%endblock%}
 {%block body1%}
-	<div class="panel panel-default" style="margin-bottom:0">  
+<div class="container">
+		<div class="row">
+			<div class="col-xs-12 col-sm-6 col-sm-offset-3">
+	<div class="panel panel-default">  
     <div class="panel-heading">
         <h3 class="panel-title">
             新建{{group.name}}维修记录
         </h3>
     </div>
+    
 		<div class="panel-body">
 			<form action="{%url 'new_note' user.id%}?group={{group.id}}" method="post">
 				{%csrf_token%}
-				{{form.as_p}}
-				<button name="submit">保存</button> 
+				{%for field in form%}
+					<label for={{field.id_for_label}}>{{field.label}}</label>
+					{{field}}
+					<p>{{field.errors.as_text}}</p>
+				{%endfor%}
+				<span class='text-danger'>{{form.non_field_errors}}</span>
+				<button class="btn btn-primary pull-right">保存</button> 
 			</form>
 		</div>
 </div>
+</div>
+</div>
+</div>
+<script>
+	$('#id_售后').change(function(){
+		var customer_id = $(this).val();
+		$.ajax({
+			url:"{%url 'ajax_unit_types'%}",
+			data:{'customer_id':customer_id},
+			success:function(data){
+				$('#id_类别').html(data)
+			}
+		})
+	})
+	$('#id_类别').change(function(){
+		var unit_type_id = $(this).val();
+		$.ajax({
+			url:"{%url 'ajax_unit_models'%}",
+			data:{'unit_type_id':unit_type_id},
+			success:function(data){
+				$('#id_型号').html(data)
+			}
+		})
+	})
+</script>
 {%endblock%}

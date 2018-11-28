@@ -4,10 +4,12 @@ from django.contrib.auth.views import LoginView
 
 urlpatterns = [
     path('' , wbz , name = 'home'),
+    path('wbz_bm' , wbz_bm , name = 'wbz_bm'),
     path('ybz/' , report_time_list , name = 'ybz'),
     path('ybz_detail/<int:rtl_id>' , ybz_detail , name = 'ybz_detail'),
     path('print_page/<int:user_id>/', print_page , name = 'print_page'),
-    path('login',LoginView.as_view(template_name='login.html'),name='login'),
+#    path('login',LoginView.as_view(template_name='login.html'),name='login'),
+    path('login', login ,name='login'),
     path('logout_view' , logout_view , name = 'logout_view'),
     path('user_admin/<int:user_id>',user_admin , name = 'user_admin'),
     path('user_admin/ybz/<int:user_id>' , user_admin_ybz , name = 'user_admin_ybz'),
@@ -28,5 +30,10 @@ urlpatterns = [
     path('report_bz/<int:user_id>' , report_bz , name = 'report_bz'),
     path('new_report_time/<int:user_id>' , new_report_time , name = 'new_report_time'),
     path('report_customer/<int:user_id>' , report_customer , name = 'report_customer'),
+    path('ybz_bm/' , ybz_bm , name = 'ybz_bm'),
+    path('ajax_unit_types' , ajax_unit_types , name = 'ajax_unit_types'),
+    path('ajax_unit_models' , ajax_unit_models , name = 'ajax_unit_models'),
+    path('download/' , download , name = 'download'),
+    path('edit_report_time/<int:report_time_id>' , edit_report_time , name = 'edit_report_time'),
     
 ]
